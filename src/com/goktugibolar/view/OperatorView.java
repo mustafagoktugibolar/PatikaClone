@@ -19,9 +19,18 @@ public class OperatorView extends JFrame {
     private JScrollPane scrll_userlist;
     private JTable tbl_users;
     private JPanel pnl_userlist;
+    private JPanel pnl_userform;
+    private JTextField fld_add_name;
+    private JTextField fld_add_usersname;
+    private JLabel lbl_add_username;
+    private JPasswordField fld_add_password;
+    private JComboBox cmb_usertype;
+    private JButton btn_add;
+    private JLabel lbl_add_password;
+    private JLabel lbl_add_usertype;
     private final Operator operator;
     private DefaultTableModel mdl_userlist;
-    private Object[] col_userlist = {"ID", "Name", "Username", "Password", "Type"};
+    private Object[] row_userlist;
 
     public OperatorView(Operator operator) {
         this.operator = operator;
@@ -42,9 +51,12 @@ public class OperatorView extends JFrame {
         // CREATE MODEL
         mdl_userlist = new DefaultTableModel();
 
+        top_operator.setTabPlacement(JTabbedPane.TOP);
+
         //CREATE OBJECT[] TO SET COLUMNS
 
-        mdl_userlist.setColumnIdentifiers(col_userlist);
+        mdl_userlist.setColumnIdentifiers(Config.COL_USERLIST);
+        row_userlist = new Object[Config.COL_USERLIST.length];
 
         //PUT MODEL INTO TABEL
         tbl_users.setModel(mdl_userlist);
@@ -54,38 +66,45 @@ public class OperatorView extends JFrame {
         //ADDING ROWS
         //Object[] firstRow = {"1", "Mustafa Goktug Ibolar", "goktugibolar", "123123qwe", "operator"};
         //mdl_userlist.addRow(firstRow);
-        showRow();
+        Helper.showRowForOV(mdl_userlist, row_userlist);
 
 
         btn_logout.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mdl_userlist.setRowCount(0);
-                showRow();
+                System.out.println("Logout clicked!");
             }
+
         });
-    }
-    private void showRow() {
-        for (User obj : User.getList()) {
-            Object[] row = new Object[col_userlist.length];
-            row[0] = obj.getId();
-            row[1] = obj.getName();
-            row[2] = obj.getUsername();
-            row[3] = obj.getPass();
-            row[4] = obj.getType();
-            mdl_userlist.addRow(row);
-        }
+        btn_add.addActionListener(e ->  {
+            if(Helper.isFieldEmpty(fld_add_name, fld_add_usersname, fld_add_password)){
+                Helper.showMessage("fill");
+            }
+            else {
+                Helper.showMessage("done");
+
+                String name = fld_add_name.getText();
+                String username = fld_add_usersname.getText();
+                String pass = fld_add_password.getText();
+                String usertype = cmb_usertype.getSelectedItem().toString();
+                User.add(name, username, pass, usertype);
+                Helper.showRowForOV(mdl_userlist, row_userlist);
+            }
+
+        });
     }
 
     public static void main(String[] args) {
-        Operator o = new Operator();
-        o.setId(1);
-        o.setName("goktug ibolar");
-        o.setUsername("goktugibolar");
-        o.setPass("123123qwe");
-        o.setType("operator");
-        new OperatorView(o);
-    }
+        SwingUtilities.invokeLater(() -> {
+            Operator o = new Operator();
+            o.setId(1);
+            o.setName("goktug ibolar");
+            o.setUsername("goktugibolar");
+            o.setPass("123123qwe");
+            o.setType("operator");
+            new OperatorView(o);
+        });
 
+    }
 
 }

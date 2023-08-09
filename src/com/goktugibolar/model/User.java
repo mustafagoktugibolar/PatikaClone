@@ -2,7 +2,10 @@ package com.goktugibolar.model;
 
 import com.goktugibolar.connection.DBConnection;
 
+import java.lang.reflect.Type;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -84,5 +87,21 @@ public class User {
             System.out.println(e.getMessage());
         }
         return userList;
+    }
+    public static boolean add(String name, String username, String password, String usertype){
+        String query = "INSERT INTO users (name, username, pass, usertype) VALUES (?, ?, ?, ? :: usertype)";
+        try{
+            PreparedStatement ps = DBConnection.getInstance().prepareStatement(query);
+            ps.setString(1, name);
+            ps.setString(2, username);
+            ps.setString(3, password);
+            ps.setString(4, usertype);
+
+            return ps.executeUpdate() != -1;
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return true;
     }
 }
