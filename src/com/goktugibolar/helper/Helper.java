@@ -1,10 +1,14 @@
 package com.goktugibolar.helper;
 
+import com.goktugibolar.connection.DBConnection;
 import com.goktugibolar.model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static javax.swing.UIManager.*;
 
@@ -40,6 +44,8 @@ public class Helper {
         return false; // All fields are non-empty
     }
 
+    //SHOW POP-UP MESSAGE
+
     public static void showMessage(String input){
         String message;
         String title;
@@ -64,6 +70,8 @@ public class Helper {
 //      public static void optionPageTR(){
 //          UIManager.put("OptionPane.okButtonText", "Tamam");
 //      }
+
+
     //SHOW TABLE ROWS FOR OPERATOR VIEW
     public static void showRowForOV(DefaultTableModel tbl, Object[] row) {
         tbl.setRowCount(0);
@@ -78,4 +86,27 @@ public class Helper {
 
         }
     }
+
+    public static void clearTextField(JTextField... fields){
+        for (JTextField field: fields) {
+            field.setText("");
+        }
+    }
+
+    public static int getRowNumber(String table){
+        int rowCount = 0;
+        String query = "SELECT COUNT(*) FROM " + table;
+        try{
+            PreparedStatement ps = DBConnection.getInstance().prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                rowCount = rs.getInt(1);
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rowCount;
+    }
+
 }

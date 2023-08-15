@@ -1,5 +1,7 @@
 package com.goktugibolar.helper;
 
+import java.sql.PreparedStatement;
+
 public class Config {
     public static final String PROJECT_TITLE = "User Management System ";
     public static final String DB_URL = "jdbc:postgresql://localhost:5432/patika";

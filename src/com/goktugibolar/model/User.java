@@ -1,6 +1,7 @@
 package com.goktugibolar.model;
 
 import com.goktugibolar.connection.DBConnection;
+import com.goktugibolar.helper.Helper;
 
 import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
@@ -90,18 +91,88 @@ public class User {
     }
     public static boolean add(String name, String username, String password, String usertype){
         String query = "INSERT INTO users (name, username, pass, usertype) VALUES (?, ?, ?, ? :: usertype)";
-        try{
-            PreparedStatement ps = DBConnection.getInstance().prepareStatement(query);
-            ps.setString(1, name);
-            ps.setString(2, username);
-            ps.setString(3, password);
-            ps.setString(4, usertype);
+        User findUser = User.getFetch(username, "SELECT * FROM users WHERE username = ?", 1);
 
-            return ps.executeUpdate() != -1;
-
-        }catch (SQLException e){
-            e.printStackTrace();
+        if(findUser != null){
+            Helper.showMessage("Choose Another Username!");
+            return false;
+        }
+        else {
+            try {
+                PreparedStatement ps = DBConnection.getInstance().prepareStatement(query);
+                ps.setString(1, name);
+                ps.setString(2, username);
+                ps.setString(3, password);
+                ps.setString(4, usertype);
+                Helper.showMessage("done");
+                return ps.executeUpdate() != -1;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
+
+
+    public static User getFetch(String check, String query, int columnNum){
+        User obj = null;
+        try{
+            PreparedStatement pr = DBConnection.getInstance().prepareStatement(query);
+            pr.setString(columnNum, check);
+            ResultSet rs = pr.executeQuery();
+            if(rs.next()){
+                obj = new User();
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUsername(rs.getString("username"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("usertype"));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+    public static User getFetch(int check, String query, int columnNum){
+        User obj = null;
+        try{
+            PreparedStatement pr = DBConnection.getInstance().prepareStatement(query);
+            pr.setInt(columnNum, check);
+            ResultSet rs = pr.executeQuery();
+            if(rs.next()){
+                obj = new User();
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUsername(rs.getString("username"));
+                obj.setPass(rs.getString("pass"));
+                obj.setType(rs.getString("usertype"));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+    public static boolean removeUserFromID(int id){
+        String query = "DELETE FROM users WHERE id = ?";
+        User findUser = User.getFetch(id, "SELECT * FROM users WHERE id = ?", 1);
+
+        if(findUser != null){
+            try {
+                PreparedStatement ps = DBConnection.getInstance().prepareStatement(query);
+                ps.setInt(1, id);
+                Helper.showMessage("User Deleted!");
+                return ps.executeUpdate() != -1;
+
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        else {
+            Helper.showMessage("User Does Not Exits!");
+            return false;
+        }
+        return true;
+    }
+
+
 }
