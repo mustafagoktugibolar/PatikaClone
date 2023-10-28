@@ -1,1 +1,3 @@
-# PATIKA.DEV CLONE
+# User Management System
+User interface : Java Swing
+Database : PostgreSQL
